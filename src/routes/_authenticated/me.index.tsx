@@ -205,7 +205,7 @@ function MePage() {
         </div>
 
         <div className="border-t border-border">
-          <RowButton icon={<Sparkles className="h-5 w-5" />} label={`${new Date().getFullYear()} 年度回顾`} onClick={() => navigate({ to: "/me/wrapped/$year", params: { year: String(new Date().getFullYear()) } })} />
+          <RowButton icon={<Sparkles className="h-5 w-5" />} label={`${new Date().getFullYear()} 年度回顾`} onClick={() => navigate({ to: "/me/wrapped/$year", params: { year: new Date().getFullYear() } })} />
         </div>
         <div className="border-t border-border">
           <RowButton icon={<MapIcon className="h-5 w-5" />} label="展会地图墙" onClick={() => navigate({ to: "/map" })} />
