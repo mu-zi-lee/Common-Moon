@@ -9,50 +9,640 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
+import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
+import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as TTokenRouteImport } from './routes/t.$token'
+import { Route as AuthenticatedCollectionIndexRouteImport } from './routes/_authenticated/collection.index'
+import { Route as AuthenticatedCollectionNewRouteImport } from './routes/_authenticated/collection.new'
+import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
+import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events.new'
+import { Route as AuthenticatedGuidesIndexRouteImport } from './routes/_authenticated/guides.index'
+import { Route as AuthenticatedGuidesIdRouteImport } from './routes/_authenticated/guides.$id'
+import { Route as AuthenticatedGuidesNewRouteImport } from './routes/_authenticated/guides.new'
+import { Route as AuthenticatedMeIndexRouteImport } from './routes/_authenticated/me.index'
+import { Route as AuthenticatedRecordsIndexRouteImport } from './routes/_authenticated/records.index'
+import { Route as AuthenticatedRecordsBatchRouteImport } from './routes/_authenticated/records.batch'
+import { Route as AuthenticatedRecordsNewRouteImport } from './routes/_authenticated/records.new'
+import { Route as AuthenticatedTeachersIndexRouteImport } from './routes/_authenticated/teachers.index'
+import { Route as AuthenticatedTeachersNameRouteImport } from './routes/_authenticated/teachers.$name'
+import { Route as AuthenticatedCollectionIdIndexRouteImport } from './routes/_authenticated/collection.$id.index'
+import { Route as AuthenticatedCollectionIdEditRouteImport } from './routes/_authenticated/collection.$id.edit'
+import { Route as AuthenticatedEventsIdIndexRouteImport } from './routes/_authenticated/events.$id.index'
+import { Route as AuthenticatedEventsIdEditRouteImport } from './routes/_authenticated/events.$id.edit'
+import { Route as AuthenticatedMeWrappedYearRouteImport } from './routes/_authenticated/me.wrapped.$year'
+import { Route as AuthenticatedRecordsIdIndexRouteImport } from './routes/_authenticated/records.$id.index'
+import { Route as AuthenticatedRecordsIdEditRouteImport } from './routes/_authenticated/records.$id.edit'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TTokenRoute = TTokenRouteImport.update({
+  id: '/t/$token',
+  path: '/t/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCollectionIndexRoute =
+  AuthenticatedCollectionIndexRouteImport.update({
+    id: '/collection/',
+    path: '/collection/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCollectionNewRoute =
+  AuthenticatedCollectionNewRouteImport.update({
+    id: '/collection/new',
+    path: '/collection/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEventsIndexRoute =
+  AuthenticatedEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEventsNewRoute = AuthenticatedEventsNewRouteImport.update({
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGuidesIndexRoute =
+  AuthenticatedGuidesIndexRouteImport.update({
+    id: '/guides/',
+    path: '/guides/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGuidesIdRoute = AuthenticatedGuidesIdRouteImport.update({
+  id: '/guides/$id',
+  path: '/guides/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGuidesNewRoute = AuthenticatedGuidesNewRouteImport.update({
+  id: '/guides/new',
+  path: '/guides/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMeIndexRoute = AuthenticatedMeIndexRouteImport.update({
+  id: '/me/',
+  path: '/me/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRecordsIndexRoute =
+  AuthenticatedRecordsIndexRouteImport.update({
+    id: '/records/',
+    path: '/records/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRecordsBatchRoute =
+  AuthenticatedRecordsBatchRouteImport.update({
+    id: '/records/batch',
+    path: '/records/batch',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRecordsNewRoute = AuthenticatedRecordsNewRouteImport.update({
+  id: '/records/new',
+  path: '/records/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTeachersIndexRoute =
+  AuthenticatedTeachersIndexRouteImport.update({
+    id: '/teachers/',
+    path: '/teachers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTeachersNameRoute =
+  AuthenticatedTeachersNameRouteImport.update({
+    id: '/teachers/$name',
+    path: '/teachers/$name',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCollectionIdIndexRoute =
+  AuthenticatedCollectionIdIndexRouteImport.update({
+    id: '/collection/$id/',
+    path: '/collection/$id/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCollectionIdEditRoute =
+  AuthenticatedCollectionIdEditRouteImport.update({
+    id: '/collection/$id/edit',
+    path: '/collection/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEventsIdIndexRoute =
+  AuthenticatedEventsIdIndexRouteImport.update({
+    id: '/events/$id/',
+    path: '/events/$id/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEventsIdEditRoute =
+  AuthenticatedEventsIdEditRouteImport.update({
+    id: '/events/$id/edit',
+    path: '/events/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMeWrappedYearRoute =
+  AuthenticatedMeWrappedYearRouteImport.update({
+    id: '/me/wrapped/$year',
+    path: '/me/wrapped/$year',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRecordsIdIndexRoute =
+  AuthenticatedRecordsIdIndexRouteImport.update({
+    id: '/records/$id/',
+    path: '/records/$id/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRecordsIdEditRoute =
+  AuthenticatedRecordsIdEditRouteImport.update({
+    id: '/records/$id/edit',
+    path: '/records/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/stats': typeof AuthenticatedStatsRoute
+  '/timeline': typeof AuthenticatedTimelineRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/t/$token': typeof TTokenRoute
+  '/collection/new': typeof AuthenticatedCollectionNewRoute
+  '/events/new': typeof AuthenticatedEventsNewRoute
+  '/guides/$id': typeof AuthenticatedGuidesIdRoute
+  '/guides/new': typeof AuthenticatedGuidesNewRoute
+  '/records/batch': typeof AuthenticatedRecordsBatchRoute
+  '/records/new': typeof AuthenticatedRecordsNewRoute
+  '/teachers/$name': typeof AuthenticatedTeachersNameRoute
+  '/collection/': typeof AuthenticatedCollectionIndexRoute
+  '/events/': typeof AuthenticatedEventsIndexRoute
+  '/guides/': typeof AuthenticatedGuidesIndexRoute
+  '/me/': typeof AuthenticatedMeIndexRoute
+  '/records/': typeof AuthenticatedRecordsIndexRoute
+  '/teachers/': typeof AuthenticatedTeachersIndexRoute
+  '/collection/$id/edit': typeof AuthenticatedCollectionIdEditRoute
+  '/events/$id/edit': typeof AuthenticatedEventsIdEditRoute
+  '/me/wrapped/$year': typeof AuthenticatedMeWrappedYearRoute
+  '/records/$id/edit': typeof AuthenticatedRecordsIdEditRoute
+  '/collection/$id/': typeof AuthenticatedCollectionIdIndexRoute
+  '/events/$id/': typeof AuthenticatedEventsIdIndexRoute
+  '/records/$id/': typeof AuthenticatedRecordsIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/stats': typeof AuthenticatedStatsRoute
+  '/timeline': typeof AuthenticatedTimelineRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/t/$token': typeof TTokenRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/collection/new': typeof AuthenticatedCollectionNewRoute
+  '/events/new': typeof AuthenticatedEventsNewRoute
+  '/guides/$id': typeof AuthenticatedGuidesIdRoute
+  '/guides/new': typeof AuthenticatedGuidesNewRoute
+  '/records/batch': typeof AuthenticatedRecordsBatchRoute
+  '/records/new': typeof AuthenticatedRecordsNewRoute
+  '/teachers/$name': typeof AuthenticatedTeachersNameRoute
+  '/collection': typeof AuthenticatedCollectionIndexRoute
+  '/events': typeof AuthenticatedEventsIndexRoute
+  '/guides': typeof AuthenticatedGuidesIndexRoute
+  '/me': typeof AuthenticatedMeIndexRoute
+  '/records': typeof AuthenticatedRecordsIndexRoute
+  '/teachers': typeof AuthenticatedTeachersIndexRoute
+  '/collection/$id/edit': typeof AuthenticatedCollectionIdEditRoute
+  '/events/$id/edit': typeof AuthenticatedEventsIdEditRoute
+  '/me/wrapped/$year': typeof AuthenticatedMeWrappedYearRoute
+  '/records/$id/edit': typeof AuthenticatedRecordsIdEditRoute
+  '/collection/$id': typeof AuthenticatedCollectionIdIndexRoute
+  '/events/$id': typeof AuthenticatedEventsIdIndexRoute
+  '/records/$id': typeof AuthenticatedRecordsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/map': typeof AuthenticatedMapRoute
+  '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/t/$token': typeof TTokenRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/collection/new': typeof AuthenticatedCollectionNewRoute
+  '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
+  '/_authenticated/guides/$id': typeof AuthenticatedGuidesIdRoute
+  '/_authenticated/guides/new': typeof AuthenticatedGuidesNewRoute
+  '/_authenticated/records/batch': typeof AuthenticatedRecordsBatchRoute
+  '/_authenticated/records/new': typeof AuthenticatedRecordsNewRoute
+  '/_authenticated/teachers/$name': typeof AuthenticatedTeachersNameRoute
+  '/_authenticated/collection/': typeof AuthenticatedCollectionIndexRoute
+  '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
+  '/_authenticated/guides/': typeof AuthenticatedGuidesIndexRoute
+  '/_authenticated/me/': typeof AuthenticatedMeIndexRoute
+  '/_authenticated/records/': typeof AuthenticatedRecordsIndexRoute
+  '/_authenticated/teachers/': typeof AuthenticatedTeachersIndexRoute
+  '/_authenticated/collection/$id/edit': typeof AuthenticatedCollectionIdEditRoute
+  '/_authenticated/events/$id/edit': typeof AuthenticatedEventsIdEditRoute
+  '/_authenticated/me/wrapped/$year': typeof AuthenticatedMeWrappedYearRoute
+  '/_authenticated/records/$id/edit': typeof AuthenticatedRecordsIdEditRoute
+  '/_authenticated/collection/$id/': typeof AuthenticatedCollectionIdIndexRoute
+  '/_authenticated/events/$id/': typeof AuthenticatedEventsIdIndexRoute
+  '/_authenticated/records/$id/': typeof AuthenticatedRecordsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/map'
+    | '/stats'
+    | '/timeline'
+    | '/share/$token'
+    | '/t/$token'
+    | '/collection/new'
+    | '/events/new'
+    | '/guides/$id'
+    | '/guides/new'
+    | '/records/batch'
+    | '/records/new'
+    | '/teachers/$name'
+    | '/collection/'
+    | '/events/'
+    | '/guides/'
+    | '/me/'
+    | '/records/'
+    | '/teachers/'
+    | '/collection/$id/edit'
+    | '/events/$id/edit'
+    | '/me/wrapped/$year'
+    | '/records/$id/edit'
+    | '/collection/$id/'
+    | '/events/$id/'
+    | '/records/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/auth'
+    | '/map'
+    | '/stats'
+    | '/timeline'
+    | '/share/$token'
+    | '/t/$token'
+    | '/'
+    | '/collection/new'
+    | '/events/new'
+    | '/guides/$id'
+    | '/guides/new'
+    | '/records/batch'
+    | '/records/new'
+    | '/teachers/$name'
+    | '/collection'
+    | '/events'
+    | '/guides'
+    | '/me'
+    | '/records'
+    | '/teachers'
+    | '/collection/$id/edit'
+    | '/events/$id/edit'
+    | '/me/wrapped/$year'
+    | '/records/$id/edit'
+    | '/collection/$id'
+    | '/events/$id'
+    | '/records/$id'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/map'
+    | '/_authenticated/stats'
+    | '/_authenticated/timeline'
+    | '/share/$token'
+    | '/t/$token'
+    | '/_authenticated/'
+    | '/_authenticated/collection/new'
+    | '/_authenticated/events/new'
+    | '/_authenticated/guides/$id'
+    | '/_authenticated/guides/new'
+    | '/_authenticated/records/batch'
+    | '/_authenticated/records/new'
+    | '/_authenticated/teachers/$name'
+    | '/_authenticated/collection/'
+    | '/_authenticated/events/'
+    | '/_authenticated/guides/'
+    | '/_authenticated/me/'
+    | '/_authenticated/records/'
+    | '/_authenticated/teachers/'
+    | '/_authenticated/collection/$id/edit'
+    | '/_authenticated/events/$id/edit'
+    | '/_authenticated/me/wrapped/$year'
+    | '/_authenticated/records/$id/edit'
+    | '/_authenticated/collection/$id/'
+    | '/_authenticated/events/$id/'
+    | '/_authenticated/records/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ShareTokenRoute: typeof ShareTokenRoute
+  TTokenRoute: typeof TTokenRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/map': {
+      id: '/_authenticated/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AuthenticatedMapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/stats': {
+      id: '/_authenticated/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof AuthenticatedStatsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/timeline': {
+      id: '/_authenticated/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof AuthenticatedTimelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/t/$token': {
+      id: '/t/$token'
+      path: '/t/$token'
+      fullPath: '/t/$token'
+      preLoaderRoute: typeof TTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/collection/': {
+      id: '/_authenticated/collection/'
+      path: '/collection'
+      fullPath: '/collection/'
+      preLoaderRoute: typeof AuthenticatedCollectionIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/collection/new': {
+      id: '/_authenticated/collection/new'
+      path: '/collection/new'
+      fullPath: '/collection/new'
+      preLoaderRoute: typeof AuthenticatedCollectionNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events/': {
+      id: '/_authenticated/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof AuthenticatedEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events/new': {
+      id: '/_authenticated/events/new'
+      path: '/events/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof AuthenticatedEventsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/guides/': {
+      id: '/_authenticated/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof AuthenticatedGuidesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/guides/$id': {
+      id: '/_authenticated/guides/$id'
+      path: '/guides/$id'
+      fullPath: '/guides/$id'
+      preLoaderRoute: typeof AuthenticatedGuidesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/guides/new': {
+      id: '/_authenticated/guides/new'
+      path: '/guides/new'
+      fullPath: '/guides/new'
+      preLoaderRoute: typeof AuthenticatedGuidesNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/me/': {
+      id: '/_authenticated/me/'
+      path: '/me'
+      fullPath: '/me/'
+      preLoaderRoute: typeof AuthenticatedMeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/records/': {
+      id: '/_authenticated/records/'
+      path: '/records'
+      fullPath: '/records/'
+      preLoaderRoute: typeof AuthenticatedRecordsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/records/batch': {
+      id: '/_authenticated/records/batch'
+      path: '/records/batch'
+      fullPath: '/records/batch'
+      preLoaderRoute: typeof AuthenticatedRecordsBatchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/records/new': {
+      id: '/_authenticated/records/new'
+      path: '/records/new'
+      fullPath: '/records/new'
+      preLoaderRoute: typeof AuthenticatedRecordsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/teachers/': {
+      id: '/_authenticated/teachers/'
+      path: '/teachers'
+      fullPath: '/teachers/'
+      preLoaderRoute: typeof AuthenticatedTeachersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/teachers/$name': {
+      id: '/_authenticated/teachers/$name'
+      path: '/teachers/$name'
+      fullPath: '/teachers/$name'
+      preLoaderRoute: typeof AuthenticatedTeachersNameRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/collection/$id/': {
+      id: '/_authenticated/collection/$id/'
+      path: '/collection/$id'
+      fullPath: '/collection/$id/'
+      preLoaderRoute: typeof AuthenticatedCollectionIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/collection/$id/edit': {
+      id: '/_authenticated/collection/$id/edit'
+      path: '/collection/$id/edit'
+      fullPath: '/collection/$id/edit'
+      preLoaderRoute: typeof AuthenticatedCollectionIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events/$id/': {
+      id: '/_authenticated/events/$id/'
+      path: '/events/$id'
+      fullPath: '/events/$id/'
+      preLoaderRoute: typeof AuthenticatedEventsIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events/$id/edit': {
+      id: '/_authenticated/events/$id/edit'
+      path: '/events/$id/edit'
+      fullPath: '/events/$id/edit'
+      preLoaderRoute: typeof AuthenticatedEventsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/me/wrapped/$year': {
+      id: '/_authenticated/me/wrapped/$year'
+      path: '/me/wrapped/$year'
+      fullPath: '/me/wrapped/$year'
+      preLoaderRoute: typeof AuthenticatedMeWrappedYearRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/records/$id/': {
+      id: '/_authenticated/records/$id/'
+      path: '/records/$id'
+      fullPath: '/records/$id/'
+      preLoaderRoute: typeof AuthenticatedRecordsIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/records/$id/edit': {
+      id: '/_authenticated/records/$id/edit'
+      path: '/records/$id/edit'
+      fullPath: '/records/$id/edit'
+      preLoaderRoute: typeof AuthenticatedRecordsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMapRoute: typeof AuthenticatedMapRoute
+  AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCollectionNewRoute: typeof AuthenticatedCollectionNewRoute
+  AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
+  AuthenticatedGuidesIdRoute: typeof AuthenticatedGuidesIdRoute
+  AuthenticatedGuidesNewRoute: typeof AuthenticatedGuidesNewRoute
+  AuthenticatedRecordsBatchRoute: typeof AuthenticatedRecordsBatchRoute
+  AuthenticatedRecordsNewRoute: typeof AuthenticatedRecordsNewRoute
+  AuthenticatedTeachersNameRoute: typeof AuthenticatedTeachersNameRoute
+  AuthenticatedCollectionIndexRoute: typeof AuthenticatedCollectionIndexRoute
+  AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
+  AuthenticatedGuidesIndexRoute: typeof AuthenticatedGuidesIndexRoute
+  AuthenticatedMeIndexRoute: typeof AuthenticatedMeIndexRoute
+  AuthenticatedRecordsIndexRoute: typeof AuthenticatedRecordsIndexRoute
+  AuthenticatedTeachersIndexRoute: typeof AuthenticatedTeachersIndexRoute
+  AuthenticatedCollectionIdEditRoute: typeof AuthenticatedCollectionIdEditRoute
+  AuthenticatedEventsIdEditRoute: typeof AuthenticatedEventsIdEditRoute
+  AuthenticatedMeWrappedYearRoute: typeof AuthenticatedMeWrappedYearRoute
+  AuthenticatedRecordsIdEditRoute: typeof AuthenticatedRecordsIdEditRoute
+  AuthenticatedCollectionIdIndexRoute: typeof AuthenticatedCollectionIdIndexRoute
+  AuthenticatedEventsIdIndexRoute: typeof AuthenticatedEventsIdIndexRoute
+  AuthenticatedRecordsIdIndexRoute: typeof AuthenticatedRecordsIdIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMapRoute: AuthenticatedMapRoute,
+  AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCollectionNewRoute: AuthenticatedCollectionNewRoute,
+  AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
+  AuthenticatedGuidesIdRoute: AuthenticatedGuidesIdRoute,
+  AuthenticatedGuidesNewRoute: AuthenticatedGuidesNewRoute,
+  AuthenticatedRecordsBatchRoute: AuthenticatedRecordsBatchRoute,
+  AuthenticatedRecordsNewRoute: AuthenticatedRecordsNewRoute,
+  AuthenticatedTeachersNameRoute: AuthenticatedTeachersNameRoute,
+  AuthenticatedCollectionIndexRoute: AuthenticatedCollectionIndexRoute,
+  AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
+  AuthenticatedGuidesIndexRoute: AuthenticatedGuidesIndexRoute,
+  AuthenticatedMeIndexRoute: AuthenticatedMeIndexRoute,
+  AuthenticatedRecordsIndexRoute: AuthenticatedRecordsIndexRoute,
+  AuthenticatedTeachersIndexRoute: AuthenticatedTeachersIndexRoute,
+  AuthenticatedCollectionIdEditRoute: AuthenticatedCollectionIdEditRoute,
+  AuthenticatedEventsIdEditRoute: AuthenticatedEventsIdEditRoute,
+  AuthenticatedMeWrappedYearRoute: AuthenticatedMeWrappedYearRoute,
+  AuthenticatedRecordsIdEditRoute: AuthenticatedRecordsIdEditRoute,
+  AuthenticatedCollectionIdIndexRoute: AuthenticatedCollectionIdIndexRoute,
+  AuthenticatedEventsIdIndexRoute: AuthenticatedEventsIdIndexRoute,
+  AuthenticatedRecordsIdIndexRoute: AuthenticatedRecordsIdIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ShareTokenRoute: ShareTokenRoute,
+  TTokenRoute: TTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
