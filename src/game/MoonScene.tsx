@@ -3,15 +3,26 @@ import { OrbitControls, Stars, useTexture } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { moonCells, type MoonCell } from "./moon-grid";
-import type { MoonTask } from "./project";
+import { taskBuilding, type MoonTask } from "./project";
+import { Building, Construction, CrewWalker, SiteDetail, SupplyRover } from "./MoonVillage";
+import { VoyageScene } from "./VoyageScene";
+import type { Voyage } from "./moon-experience";
+import { crewPosts } from "./village-model";
+import { spherePoint } from "./moon-path";
 
 type Props = {
   tasks: MoonTask[];
+  crewSlots: number[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   intro: boolean;
   reset: number;
   focus: number;
+  voyage: Voyage | null;
+  voyageStartedAt: number;
+  constructionRate: number;
+  reducedMotion: boolean;
+  arrived: boolean;
 };
 
 type TileRegion = {
@@ -102,9 +113,9 @@ function makeRegion(cells: MoonCell[]): TileRegion {
   const sideGeometry = new THREE.BufferGeometry();
   sideGeometry.setAttribute("position", new THREE.Float32BufferAttribute(sides, 3));
   sideGeometry.computeVertexNormals();
-  const forward = (normal: THREE.Vector3) => normal.x * 0.44 + normal.z * 0.9;
+  const centerDirection = centerOfRegion.clone().normalize();
   const settlement: THREE.Vector3[] = [];
-  for (const normal of normals.sort((a, b) => forward(b) - forward(a))) {
+  for (const normal of normals.sort((a, b) => b.dot(centerDirection) - a.dot(centerDirection))) {
     if (settlement.every((anchor) => anchor.dot(normal) < 0.985)) settlement.push(normal);
     if (settlement.length === (cells.length >= 25 ? 4 : 3)) break;
   }
@@ -118,92 +129,7 @@ function taskColor(task: MoonTask, selected: boolean) {
   return new THREE.Color(selected ? "#e5dbc0" : "#aebfbb");
 }
 
-function Habitat({ normal, kind }: { normal: THREE.Vector3; kind: number }) {
-  const rotation = useMemo(
-    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal),
-    [normal],
-  );
-  const scale = kind === 0 ? 1 : 0.76;
-  if (kind === 3) {
-    return (
-      <group
-        position={normal.clone().multiplyScalar(tileHeight(normal).radius + 0.012)}
-        quaternion={rotation}
-      >
-        <mesh position={[0, 0.012, 0]}>
-          <cylinderGeometry args={[0.14, 0.15, 0.025, 7]} />
-          <meshStandardMaterial color="#8da891" flatShading />
-        </mesh>
-        {[-0.07, 0, 0.07].map((x, i) => (
-          <group key={i} position={[x, 0.04, i === 1 ? -0.04 : 0.035]}>
-            <mesh position={[0, 0.04, 0]}>
-              <cylinderGeometry args={[0.008, 0.012, 0.09, 4]} />
-              <meshStandardMaterial color="#749e7b" />
-            </mesh>
-            <mesh position={[0.015, 0.085, 0]}>
-              <dodecahedronGeometry args={[0.048, 0]} />
-              <meshStandardMaterial color={i === 1 ? "#a4d5a0" : "#79ae94"} flatShading />
-            </mesh>
-          </group>
-        ))}
-      </group>
-    );
-  }
-  return (
-    <group
-      position={normal.clone().multiplyScalar(tileHeight(normal).radius + 0.013)}
-      quaternion={rotation}
-      scale={scale}
-    >
-      <mesh position={[0, 0.013, 0]}>
-        <cylinderGeometry args={[0.165, 0.18, 0.035, 6]} />
-        <meshStandardMaterial color="#8a8776" flatShading roughness={1} />
-      </mesh>
-      <mesh position={[0, 0.084, 0]}>
-        <boxGeometry args={[0.205, 0.115, 0.18]} />
-        <meshStandardMaterial
-          color={kind === 1 ? "#b8dac8" : "#f4ddba"}
-          flatShading
-          roughness={1}
-        />
-      </mesh>
-      <mesh position={[0, 0.172, 0]} rotation={[0, Math.PI / 4, 0]}>
-        <coneGeometry args={[0.17, 0.092, 4]} />
-        <meshStandardMaterial
-          color={kind === 1 ? "#718e87" : "#d78060"}
-          flatShading
-          roughness={0.9}
-        />
-      </mesh>
-      <mesh position={[0, 0.095, 0.094]}>
-        <boxGeometry args={[0.075, 0.064, 0.008]} />
-        <meshBasicMaterial color="#ffe5a4" />
-      </mesh>
-      <mesh position={[-0.058, 0.092, -0.094]}>
-        <boxGeometry args={[0.043, 0.052, 0.008]} />
-        <meshBasicMaterial color="#ffe5a4" />
-      </mesh>
-      {kind === 0 && (
-        <group>
-          <mesh position={[0.19, 0.115, -0.07]}>
-            <cylinderGeometry args={[0.018, 0.024, 0.2, 6]} />
-            <meshStandardMaterial color="#ad8072" />
-          </mesh>
-          <mesh position={[0.19, 0.23, -0.07]}>
-            <sphereGeometry args={[0.047, 6, 4]} />
-            <meshBasicMaterial color="#ffe4a6" />
-          </mesh>
-          <mesh position={[-0.17, 0.08, 0.1]} rotation={[0, 0.35, 0]}>
-            <dodecahedronGeometry args={[0.055, 0]} />
-            <meshStandardMaterial color="#91b9a0" flatShading />
-          </mesh>
-        </group>
-      )}
-    </group>
-  );
-}
-
-function Footpaths({ anchors }: { anchors: THREE.Vector3[] }) {
+function Footpaths({ anchors, working }: { anchors: THREE.Vector3[]; working: boolean }) {
   const paths = useMemo(
     () =>
       anchors.slice(1).map((end) => {
@@ -222,9 +148,24 @@ function Footpaths({ anchors }: { anchors: THREE.Vector3[] }) {
   useEffect(() => () => paths.forEach((path) => path.dispose()), [paths]);
   return paths.map((path, index) => (
     <mesh geometry={path} key={index}>
-      <meshStandardMaterial color="#e9d3a6" roughness={1} />
+      <meshStandardMaterial color={working ? "#a7cbb8" : "#e9d3a6"} roughness={1} />
     </mesh>
   ));
+}
+
+function SupplyRoute({ home, site }: { home: THREE.Vector3; site: THREE.Vector3 }) {
+  const path = useMemo(() => {
+    const points = Array.from({ length: 33 }, (_, index) =>
+      spherePoint(home, site, index / 32).multiplyScalar(2.11),
+    );
+    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 48, 0.006, 4, false);
+  }, [home, site]);
+  useEffect(() => () => path.dispose(), [path]);
+  return (
+    <mesh geometry={path}>
+      <meshStandardMaterial color="#b4d8b9" transparent opacity={0.58} roughness={1} />
+    </mesh>
+  );
 }
 
 function Signal({ normal, status }: { normal: THREE.Vector3; status: MoonTask["status"] }) {
@@ -247,12 +188,18 @@ function Region({
   selected,
   onSelect,
   texture,
+  home,
+  constructionRate,
+  reducedMotion,
 }: {
   task: MoonTask;
   geometry: TileRegion;
   selected: boolean;
   onSelect: () => void;
   texture: THREE.Texture;
+  home: THREE.Vector3;
+  constructionRate: number;
+  reducedMotion: boolean;
 }) {
   const surface = useRef<THREE.MeshStandardMaterial>(null);
   const edge = useRef<THREE.MeshStandardMaterial>(null);
@@ -302,12 +249,46 @@ function Region({
           flatShading
         />
       </mesh>
+      {(task.status === "approved" || task.status === "focusing") && (
+        <Footpaths anchors={geometry.settlement} working={task.status === "focusing"} />
+      )}
       {task.status === "approved" && (
         <>
-          <Footpaths anchors={geometry.settlement} />
-          {geometry.settlement.map((normal, index) => (
-            <Habitat key={index} normal={normal} kind={index} />
+          {geometry.settlement.map((normal, buildingIndex) => (
+            <group
+              key={buildingIndex}
+              position={normal.clone().multiplyScalar(tileHeight(normal).radius + 0.012)}
+              quaternion={new THREE.Quaternion().setFromUnitVectors(
+                new THREE.Vector3(0, 1, 0),
+                normal,
+              )}
+            >
+              {buildingIndex === 0 ? (
+                <group scale={1.25}>
+                  <Building kind={taskBuilding(task)} />
+                </group>
+              ) : (
+                <SiteDetail kind={taskBuilding(task)} variant={buildingIndex} />
+              )}
+            </group>
           ))}
+        </>
+      )}
+      {(task.status === "focusing" || task.status === "submitted" || task.focusMs > 0) &&
+        task.status !== "approved" &&
+        geometry.settlement[0] && (
+          <Construction
+            task={task}
+            normal={geometry.settlement[0]}
+            radius={tileHeight(geometry.settlement[0]).radius + 0.016}
+            rate={constructionRate}
+            reducedMotion={reducedMotion}
+          />
+        )}
+      {task.status === "focusing" && geometry.settlement[0] && (
+        <>
+          <SupplyRoute home={home} site={geometry.settlement[0]} />
+          <SupplyRover anchors={[home, geometry.settlement[0]]} reducedMotion={reducedMotion} />
         </>
       )}
       {(task.status === "focusing" || task.status === "submitted") && (
@@ -351,11 +332,30 @@ function useStorybookTexture(source: THREE.Texture) {
 
 function Moon({
   tasks,
+  crewSlots,
   selectedId,
   onSelect,
   intro,
-}: Pick<Props, "tasks" | "selectedId" | "onSelect" | "intro">) {
+  constructionRate,
+  reducedMotion,
+  voyage,
+  voyageStartedAt,
+  arrived,
+}: Pick<
+  Props,
+  | "tasks"
+  | "crewSlots"
+  | "selectedId"
+  | "onSelect"
+  | "intro"
+  | "constructionRate"
+  | "reducedMotion"
+  | "voyage"
+  | "voyageStartedAt"
+  | "arrived"
+>) {
   const [color, height] = useTexture(["/moon-color.jpg", "/moon-height.jpg"]);
+  const { size } = useThree();
   const map = useStorybookTexture(color);
   const taskCount = tasks.length;
   const moonGroup = useRef<THREE.Group>(null);
@@ -367,6 +367,8 @@ function Moon({
       makeRegion(cells.filter((cell) => cell.taskIndex === index)),
     );
   }, [taskCount]);
+  const posts = crewPosts(tasks, crewSlots, selectedId, Date.now());
+  const home = regions[0]?.settlement.at(-1) ?? new THREE.Vector3(0, 0, 1);
   useEffect(
     () => () =>
       regions.forEach(({ top, sides }) => {
@@ -377,16 +379,32 @@ function Moon({
   );
   useFrame(({ clock }) => {
     if (!moonGroup.current) return;
-    if (intro) {
+    if (voyage) {
+      const elapsed = (performance.now() - voyageStartedAt) / 1000;
+      const t = Math.min(1, Math.max(0, (elapsed - 2.5) / 6.5));
+      const departure = Math.min(1, elapsed / 3);
+      moonGroup.current.visible = voyage !== "outbound" || elapsed >= 2.5;
+      moonGroup.current.position.x =
+        voyage === "outbound" ? (1 - t) * (size.width < 720 ? 3.2 : 7) : -departure * 7;
+      moonGroup.current.scale.setScalar(
+        voyage === "outbound" ? 0.27 + t * 0.73 : 1 - departure * 0.73,
+      );
+      moonGroup.current.rotation.y = -0.45 + (voyage === "outbound" ? 1 - t : departure) * 0.6;
+      wasIntro.current = false;
+      introStart.current = null;
+    } else if (intro) {
+      moonGroup.current.visible = true;
       wasIntro.current = true;
       introStart.current ??= clock.elapsedTime;
       const t = Math.min(1, (clock.elapsedTime - introStart.current) / 5.2);
       const ease = t * t * (3 - 2 * t);
       moonGroup.current.rotation.y = -1.4 + ease * 0.95;
       moonGroup.current.scale.setScalar(0.8 + ease * 0.2);
-    } else if (wasIntro.current) {
+    } else {
+      moonGroup.current.visible = !arrived;
+      moonGroup.current.position.x = arrived ? -7 : 0;
       moonGroup.current.rotation.y = -0.45;
-      moonGroup.current.scale.setScalar(1);
+      moonGroup.current.scale.setScalar(arrived ? 0.27 : 1);
       introStart.current = null;
       wasIntro.current = false;
     }
@@ -413,21 +431,43 @@ function Moon({
           task={task}
           geometry={regions[index]}
           texture={map}
+          home={home}
           selected={task.id === selectedId}
           onSelect={() => onSelect(task.id)}
+          constructionRate={constructionRate}
+          reducedMotion={reducedMotion}
         />
       ))}
+      {posts.map((post) => {
+        const task = post.taskIndex === null ? null : tasks[post.taskIndex];
+        const anchors = post.taskIndex === null ? [] : regions[post.taskIndex].settlement;
+        return (
+          <CrewWalker
+            key={post.owner}
+            home={home}
+            anchors={anchors}
+            owner={post.owner}
+            activity={post.activity}
+            kind={task ? taskBuilding(task) : "habitat"}
+            selected={task?.id === selectedId}
+            reducedMotion={reducedMotion}
+            onSelect={() => task && onSelect(task.id)}
+          />
+        );
+      })}
     </group>
   );
 }
 
 function Camera({
   intro,
+  voyage,
+  arrived,
   reset,
   focus,
   selectedId,
   tasks,
-}: Pick<Props, "intro" | "reset" | "focus" | "selectedId" | "tasks">) {
+}: Pick<Props, "intro" | "voyage" | "arrived" | "reset" | "focus" | "selectedId" | "tasks">) {
   const { camera, size } = useThree();
   const lastReset = useRef(-1);
   const lastFocus = useRef(0);
@@ -449,7 +489,12 @@ function Camera({
     return direction.normalize().applyEuler(new THREE.Euler(0.08, -0.45, 0));
   }, [selectedId, tasks]);
   useFrame(({ clock }, delta) => {
-    if (intro) {
+    if (voyage || arrived) {
+      flyTo.current = null;
+      camera.position.set(0, 0.25, distance);
+      camera.lookAt(0, 0, 0);
+      lastReset.current = reset;
+    } else if (intro) {
       wasIntro.current = true;
       flyTo.current = null;
       started.current ??= clock.elapsedTime;
@@ -483,7 +528,7 @@ function Camera({
   return (
     <OrbitControls
       makeDefault
-      enabled={!intro && controlsReady}
+      enabled={!intro && !voyage && !arrived && controlsReady}
       enablePan={false}
       minDistance={4.3}
       maxDistance={13}
@@ -524,12 +569,26 @@ export function MoonScene(props: Props) {
       <Stars radius={65} depth={30} count={1300} factor={2.2} saturation={0} fade speed={0} />
       <Moon
         tasks={props.tasks}
+        crewSlots={props.crewSlots}
         selectedId={props.selectedId}
         onSelect={props.onSelect}
         intro={props.intro}
+        constructionRate={props.constructionRate}
+        reducedMotion={props.reducedMotion}
+        voyage={props.voyage}
+        voyageStartedAt={props.voyageStartedAt}
+        arrived={props.arrived}
+      />
+      <VoyageScene
+        voyage={props.voyage}
+        startedAt={props.voyageStartedAt}
+        arrived={props.arrived}
+        reducedMotion={props.reducedMotion}
       />
       <Camera
         intro={props.intro}
+        voyage={props.voyage}
+        arrived={props.arrived}
         reset={props.reset}
         focus={props.focus}
         selectedId={props.selectedId}

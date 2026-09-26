@@ -16,6 +16,11 @@ it("parses project commands without executing AI suggestions", () => {
     type: "action",
     action: { type: "submit", index: 1, evidence: "PR #5" },
   });
+  expect(parseProjectCommand("/building 2 workshop")).toEqual({
+    type: "action",
+    action: { type: "building", index: 2, buildingKind: "workshop" },
+  });
+  expect(parseProjectCommand("/building 2 castle")).toEqual({ type: "help" });
   let state = newProject("Demo", "Ship");
   state = applyProjectAction(
     state,
@@ -29,4 +34,11 @@ it("parses project commands without executing AI suggestions", () => {
     taskId: state.tasks[0].id,
   });
   expect(() => resolveProjectAction(state, { type: "approve", index: 2 })).toThrow();
+  expect(
+    resolveProjectAction(state, { type: "building", index: 1, buildingKind: "relay" }),
+  ).toEqual({
+    type: "building",
+    taskId: state.tasks[0].id,
+    buildingKind: "relay",
+  });
 });

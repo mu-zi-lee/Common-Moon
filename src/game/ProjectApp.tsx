@@ -15,6 +15,7 @@ import {
   Pause,
   Play,
   Plus,
+  Rocket,
   Radio,
   RotateCcw,
   Send,
@@ -30,13 +31,26 @@ import {
 } from "./project.functions";
 import {
   applyProjectAction,
+  buildingKinds,
+  buildingNames,
   newProject,
   progress,
+  suggestedBuilding,
+  taskBuilding,
+  type BuildingKind,
   type MoonTask,
   type ProjectAction,
   type ProjectState,
 } from "./project";
 import type { ProjectView } from "./project.store.server";
+import { crewColors } from "./village-model";
+import {
+  missionComplete,
+  voyageChapter,
+  voyageCopy,
+  voyageDurations,
+  type Voyage,
+} from "./moon-experience";
 import "./project.css";
 
 const MoonScene = lazy(() =>
@@ -140,14 +154,19 @@ export function ProjectApp() {
   const [code, setCode] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [taskTitle, setTaskTitle] = useState("");
+  const [buildingKind, setBuildingKind] = useState<BuildingKind | "suggested">("suggested");
   const [acceptance, setAcceptance] = useState("");
   const [evidence, setEvidence] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [intro, setIntro] = useState(false);
-  const [introPhase, setIntroPhase] = useState(0);
-  const introTimers = useRef<number[]>([]);
+  const [voyage, setVoyage] = useState<Voyage | null>(null);
+  const [voyageStartedAt, setVoyageStartedAt] = useState(0);
+  const [arrived, setArrived] = useState(false);
+  const voyageTimer = useRef<number | null>(null);
+  const lastCompletion = useRef<{ code: string; complete: boolean } | null>(null);
+  const reducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [reset, setReset] = useState(0);
   const [focus, setFocus] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -163,44 +182,53 @@ export function ProjectApp() {
   const slot = mode === "local" ? localSlot : (view?.slot ?? 0);
   const liveCode = mode === "live" ? view?.code : undefined;
 
-  const stopIntro = useCallback(() => {
-    introTimers.current.forEach(window.clearTimeout);
-    introTimers.current = [];
-    setIntro(false);
+  const stopVoyage = useCallback((destination: Voyage | null = null) => {
+    if (voyageTimer.current !== null) window.clearTimeout(voyageTimer.current);
+    voyageTimer.current = null;
+    setVoyage(null);
+    if (destination === "homebound") setArrived(true);
   }, []);
 
-  useEffect(() => () => introTimers.current.forEach(window.clearTimeout), []);
-
-  const beginIntro = useCallback(
-    (key: string) => {
-      stopIntro();
-      if (
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        sessionStorage.getItem(`moon-intro-${key}`)
-      )
-        return;
-      sessionStorage.setItem(`moon-intro-${key}`, "1");
-      setIntro(true);
-      setIntroPhase(0);
-      introTimers.current = [
-        window.setTimeout(() => setIntroPhase(1), 1600),
-        window.setTimeout(() => setIntroPhase(2), 3400),
-        window.setTimeout(stopIntro, 5200),
-      ];
+  useEffect(
+    () => () => {
+      if (voyageTimer.current !== null) window.clearTimeout(voyageTimer.current);
     },
-    [stopIntro],
+    [],
+  );
+
+  const startVoyage = useCallback(
+    (direction: Voyage, key?: string) => {
+      stopVoyage();
+      if (direction === "outbound" && key && sessionStorage.getItem(`moon-voyage-${key}`)) return;
+      if (direction === "outbound" && key) sessionStorage.setItem(`moon-voyage-${key}`, "1");
+      if (reducedMotion) {
+        if (direction === "homebound") setArrived(true);
+        return;
+      }
+      setArrived(false);
+      setVoyageStartedAt(performance.now());
+      setVoyage(direction);
+      voyageTimer.current = window.setTimeout(
+        () => stopVoyage(direction),
+        voyageDurations[direction] * 1000,
+      );
+    },
+    [reducedMotion, stopVoyage],
   );
 
   const enter = useCallback(
     (next: ProjectView) => {
+      stopVoyage();
       setView(next);
       setMode("live");
       setSelectedId(null);
       setError("");
       history.replaceState(null, "", `/?project=${encodeURIComponent(next.code)}`);
-      beginIntro(next.code);
+      const complete = missionComplete(next.state);
+      setArrived(complete);
+      if (!complete) startVoyage("outbound", next.code);
     },
-    [beginIntro],
+    [startVoyage, stopVoyage],
   );
 
   useEffect(() => {
@@ -234,6 +262,22 @@ export function ProjectApp() {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (!view || mode === "home") {
+      lastCompletion.current = null;
+      return;
+    }
+    const complete = missionComplete(view.state);
+    if (
+      lastCompletion.current?.code === view.code &&
+      !lastCompletion.current.complete &&
+      complete
+    ) {
+      startVoyage("homebound");
+    }
+    lastCompletion.current = { code: view.code, complete };
+  }, [view, mode, startVoyage]);
 
   async function create() {
     setLoading(true);
@@ -273,7 +317,8 @@ export function ProjectApp() {
     setError("");
     setSelectedId(state.tasks[1]?.id ?? null);
     history.replaceState(null, "", "/");
-    beginIntro("LOCAL");
+    setArrived(missionComplete(state));
+    if (!missionComplete(state)) startVoyage("outbound", "LOCAL");
   }
 
   async function act(action: ProjectAction) {
@@ -293,6 +338,7 @@ export function ProjectApp() {
       if (action.type === "add") {
         setTaskTitle("");
         setAcceptance("");
+        setBuildingKind("suggested");
       }
       if (action.type === "submit") setEvidence("");
       if (action.type === "block" || action.type === "reject") setReason("");
@@ -322,7 +368,9 @@ export function ProjectApp() {
     setMode("home");
     setView(null);
     setSelectedId(null);
-    stopIntro();
+    stopVoyage();
+    setArrived(false);
+    lastCompletion.current = null;
     setJoining(false);
     setError("");
     history.replaceState(null, "", "/");
@@ -336,11 +384,17 @@ export function ProjectApp() {
         >
           <MoonScene
             tasks={mode === "home" ? preview.tasks : state.tasks}
+            crewSlots={mode === "home" ? [1, 2] : (view?.crew.map((member) => member.slot) ?? [])}
             selectedId={selectedId}
             onSelect={selectTask}
-            intro={intro}
+            intro={false}
             reset={reset}
             focus={focus}
+            voyage={voyage}
+            voyageStartedAt={voyageStartedAt}
+            arrived={arrived}
+            constructionRate={mode === "local" ? 150 : 1}
+            reducedMotion={reducedMotion}
           />
         </Suspense>
       </div>
@@ -542,7 +596,7 @@ export function ProjectApp() {
             </div>
             {total > 0 && approved === total && (
               <p className="moon-complete">
-                <CheckCheck size={16} /> Your moon is whole. Made together.
+                <CheckCheck size={16} /> Your moon is whole. Time to go home.
               </p>
             )}
           </div>
@@ -586,6 +640,9 @@ export function ProjectApp() {
               {mode === "local" && (
                 <div className="moon-local">
                   Interactive sample · Stored in this browser. No Telegram messages are sent.
+                  <p className="moon-demo-note">
+                    Construction preview is accelerated. Focus time and review rules are not.
+                  </p>
                   <div className="moon-segment" aria-label="Simulated crew seat">
                     <button
                       className={localSlot === 1 ? "active" : ""}
@@ -624,7 +681,15 @@ export function ProjectApp() {
                       className="moon-task-form"
                       onSubmit={(event) => {
                         event.preventDefault();
-                        void act({ type: "add", title: taskTitle, acceptance });
+                        void act({
+                          type: "add",
+                          title: taskTitle,
+                          acceptance,
+                          buildingKind:
+                            buildingKind === "suggested"
+                              ? suggestedBuilding(taskTitle)
+                              : buildingKind,
+                        });
                       }}
                     >
                       <label>
@@ -636,6 +701,25 @@ export function ProjectApp() {
                           placeholder="A concrete deliverable"
                           required
                         />
+                      </label>
+                      <label className="moon-select-label">
+                        Building
+                        <select
+                          aria-label="Building type"
+                          value={buildingKind}
+                          onChange={(event) =>
+                            setBuildingKind(event.target.value as BuildingKind | "suggested")
+                          }
+                        >
+                          <option value="suggested">
+                            Suggested: {buildingNames[suggestedBuilding(taskTitle)]}
+                          </option>
+                          {buildingKinds.map((kind) => (
+                            <option key={kind} value={kind}>
+                              {buildingNames[kind]}
+                            </option>
+                          ))}
+                        </select>
                       </label>
                       <label>
                         Done when
@@ -717,6 +801,41 @@ export function ProjectApp() {
                     <span>{taskLabel(selected).toUpperCase()}</span>
                   </div>
                   <h3>{selected.title}</h3>
+                  <div className="moon-build-identity">
+                    <span
+                      className="moon-build-dot"
+                      style={{
+                        background: crewColors[((selected.owner ?? 1) - 1) % crewColors.length],
+                      }}
+                    />
+                    {buildingNames[taskBuilding(selected)]}
+                    <span>·</span>
+                    {view?.crew.find((member) => member.slot === selected.owner)?.name ??
+                      "Unassigned"}
+                  </div>
+                  {state.phase === "planning" && slot === 1 && (
+                    <label className="moon-select-label">
+                      Building
+                      <select
+                        aria-label="Building type"
+                        value={taskBuilding(selected)}
+                        onChange={(event) =>
+                          void act({
+                            type: "building",
+                            taskId: selected.id,
+                            buildingKind: event.target.value as BuildingKind,
+                          })
+                        }
+                        disabled={loading}
+                      >
+                        {buildingKinds.map((kind) => (
+                          <option key={kind} value={kind}>
+                            {buildingNames[kind]}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                   <p className="moon-criteria">
                     <strong>Done when</strong>
                     {selected.acceptance}
@@ -938,32 +1057,71 @@ export function ProjectApp() {
           </aside>
         </>
       )}
-      {intro && (
-        <div className="moon-intro" aria-live="polite">
-          <span className="moon-kicker">COMMON MOON / 共月</span>
-          <div key={introPhase} className="moon-intro-main">
-            <p>
-              {introPhase === 0
-                ? "A PROJECT BEGINS"
-                : introPhase === 1
-                  ? "DIFFERENT PLACES, ONE SKY"
-                  : "EVERY TASK BRINGS US CLOSER"}
-            </p>
-            <strong>
-              {introPhase === 0 ? "One moon." : introPhase === 1 ? "Many hands." : "Made together."}
-            </strong>
-            <span className="moon-intro-verse">千里共婵娟</span>
+      {voyage &&
+        (() => {
+          const elapsed = Math.max(0, (performance.now() - voyageStartedAt) / 1000);
+          const chapter = voyageChapter(voyage, elapsed);
+          const [label, heading, detail] = voyageCopy[voyage][chapter];
+          return (
+            <div className="moon-voyage" aria-live="polite">
+              <span className="moon-voyage-brand">
+                COMMON MOON <span>/ 共月</span>
+              </span>
+              <div className="moon-voyage-copy" key={`${voyage}-${chapter}`}>
+                <p>{label}</p>
+                <strong>{heading}</strong>
+                <span>{detail}</span>
+              </div>
+              <div className="moon-voyage-bottom">
+                <span>{voyage === "outbound" ? "EARTH → MOON" : "MOON → EARTH"}</span>
+                {voyage === "homebound" && (
+                  <small>A visual sky journal, not a live astronomical forecast.</small>
+                )}
+                <button onClick={() => stopVoyage(voyage)}>
+                  Skip <ArrowRight size={17} />
+                </button>
+              </div>
+              <div className="moon-voyage-track">
+                <i key={voyage} style={{ animationDuration: `${voyageDurations[voyage]}s` }} />
+              </div>
+            </div>
+          );
+        })()}
+      {arrived && !voyage && mode !== "home" && (
+        <div className="moon-arrival" aria-live="polite">
+          <div className="moon-arrival-top">
+            COMMON MOON <span>/ 返航记录</span>
           </div>
-          <div className="moon-intro-footer">
-            <span>{introPhase === 2 ? "YOUR MOON IS WAITING" : "ESTABLISHING SHARED ORBIT"}</span>
-            <button onClick={stopIntro}>
-              Skip <ArrowRight size={16} />
-            </button>
+          <div className="moon-arrival-copy">
+            <span className="moon-kicker">MISSION COMPLETE / EARTH</span>
+            <h2>
+              Welcome
+              <br />
+              <em>home.</em>
+            </h2>
+            <p>{state.title}</p>
+            <span>
+              {approved} of {total} pieces built and reviewed together.
+            </span>
+            <div className="moon-arrival-actions">
+              <button className="moon-primary" onClick={() => setArrived(false)}>
+                View our Moon <ArrowRight size={17} />
+              </button>
+              <button className="moon-arrival-secondary" onClick={leave}>
+                Start a new project <Plus size={16} />
+              </button>
+            </div>
           </div>
-          <div className="moon-intro-progress">
-            <i />
+          <div className="moon-arrival-bottom">
+            <span>千里共婵娟</span>
+            <span>NASA BLUE MARBLE / MOON KIT</span>
           </div>
         </div>
+      )}
+      {mode !== "home" && !arrived && !voyage && missionComplete(state) && (
+        <button className="moon-return" onClick={() => startVoyage("homebound")}>
+          <Rocket size={17} /> Return to Earth
+        </button>
       )}
     </div>
   );

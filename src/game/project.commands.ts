@@ -1,9 +1,10 @@
-import type { ProjectAction, ProjectState } from "./project";
+import { buildingKinds, type BuildingKind, type ProjectAction, type ProjectState } from "./project";
 
 type IndexedAction =
   | { type: "add"; title: string; acceptance: string }
   | { type: "launch" }
   | { type: "assign"; index: number; owner: number }
+  | { type: "building"; index: number; buildingKind: BuildingKind }
   | { type: "focus" | "pause" | "approve"; index: number }
   | { type: "submit"; index: number; evidence: string }
   | { type: "block" | "reject"; index: number; reason: string };
@@ -46,6 +47,16 @@ export function parseProjectCommand(text: string, botUsername?: string): Project
           }
         : { type: "help" };
     }
+    if (command === "building") {
+      const choice = /^(\d{1,2})\s+([a-z]+)$/i.exec(arg);
+      const kind = choice?.[2].toLowerCase() as BuildingKind;
+      return choice && Number(choice[1]) > 0 && buildingKinds.includes(kind)
+        ? {
+            type: "action",
+            action: { type: "building", index: Number(choice[1]), buildingKind: kind },
+          }
+        : { type: "help" };
+    }
     const numbered = /^(\d{1,2})(?:\s+([\s\S]+))?$/.exec(arg);
     if (numbered && Number(numbered[1]) > 0) {
       const index = Number(numbered[1]);
@@ -74,6 +85,8 @@ export function resolveProjectAction(state: ProjectState, action: IndexedAction)
   if (!task)
     throw new Error(`Sector ${action.index} does not exist. Use /status to see the task list.`);
   if (action.type === "assign") return { type: "assign", taskId: task.id, owner: action.owner };
+  if (action.type === "building")
+    return { type: "building", taskId: task.id, buildingKind: action.buildingKind };
   if (action.type === "submit")
     return { type: "submit", taskId: task.id, evidence: action.evidence };
   if (action.type === "block" || action.type === "reject")
@@ -99,6 +112,7 @@ export const PROJECT_HELP =
   "/plan — ask the agent for a suggested next step (never changes tasks)\n" +
   "/add title | done when... — creator charts a sector\n" +
   "/assign NUMBER CREW_SLOT — creator assigns a teammate\n" +
+  "/building NUMBER habitat|workshop|greenhouse|observatory|relay — choose a building before launch\n" +
   "/launch — lock the map once everyone is assigned\n" +
   "/focus NUMBER, /pause NUMBER — log focus time\n" +
   "/submit NUMBER result or link — request a review\n" +

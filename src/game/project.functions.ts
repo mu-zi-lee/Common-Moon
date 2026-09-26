@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { ProjectAction } from "./project";
+import { buildingKinds, type ProjectAction } from "./project";
 
 const Code = z.string().regex(/^[A-HJ-NP-Z2-9]{10}$/);
 const Identity = z.object({ code: Code });
@@ -15,6 +15,12 @@ const Action = z.discriminatedUnion("type", [
     type: z.literal("add"),
     title: z.string().trim().min(1).max(90),
     acceptance: z.string().trim().min(1).max(300),
+    buildingKind: z.enum(buildingKinds).optional(),
+  }),
+  z.object({
+    type: z.literal("building"),
+    taskId: z.string().uuid(),
+    buildingKind: z.enum(buildingKinds),
   }),
   z.object({
     type: z.literal("assign"),

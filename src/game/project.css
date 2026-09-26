@@ -454,8 +454,12 @@
   gap: 11px;
   margin: 18px 0 26px;
 }
+.moon-task-form .moon-select-label {
+  margin: 0;
+}
 .moon-task-form input,
 .moon-task-form textarea,
+.moon-task-form select,
 .moon-mini-form input,
 .moon-mini-form textarea,
 .moon-select-label select {
@@ -981,5 +985,287 @@
   .moon-app *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mission transitions keep the planets unobstructed; only the captions carry a veil. */
+.moon-app {
+  --jade: #96cdbb;
+  --cream: #f6f1e8;
+  --gold: #e5b787;
+  font-family: "Work Sans", system-ui, sans-serif;
+}
+.moon-app h1,
+.moon-panel-heading h2,
+.moon-inspector h3,
+.moon-voyage-copy strong,
+.moon-arrival h2 {
+  font-family: "Instrument Serif", Georgia, "Songti SC", serif;
+  font-weight: 400;
+}
+.moon-onboard h1 {
+  font-size: clamp(48px, 4.7vw, 70px);
+  line-height: 0.98;
+}
+.moon-onboard h1 em {
+  color: #e9b793;
+}
+.moon-overview h1 {
+  font-size: clamp(28px, 2.8vw, 42px);
+}
+.moon-panel-heading h2 {
+  font-size: 30px;
+  line-height: 1.1;
+}
+.moon-inspector h3 {
+  font-size: 23px;
+}
+.moon-primary,
+.moon-launch {
+  background: #d8a783;
+  color: #202929;
+}
+.moon-primary:hover,
+.moon-launch:hover {
+  background: #efc6a5;
+}
+.moon-task-row.selected {
+  background: #e9ece6;
+  box-shadow: inset 2px 0 #bd816b;
+}
+.moon-build-identity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: -4px 0 18px;
+  font-size: 11px;
+  color: #61756a;
+}
+.moon-build-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.moon-demo-note {
+  margin: 9px 0 0;
+  color: #527668;
+  font-size: 10px;
+}
+.moon-return {
+  position: absolute;
+  z-index: 7;
+  left: clamp(18px, 3vw, 46px);
+  bottom: 64px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 17px;
+  border: 1px solid #dea986;
+  border-radius: 4px;
+  background: #d8a783;
+  color: #213032;
+  font-size: 12px;
+  font-weight: 650;
+}
+.moon-app:has(.moon-voyage, .moon-arrival) .moon-header,
+.moon-app:has(.moon-voyage, .moon-arrival) .moon-overview,
+.moon-app:has(.moon-voyage, .moon-arrival) .moon-bottom-note,
+.moon-app:has(.moon-voyage, .moon-arrival) .moon-panel {
+  visibility: hidden;
+}
+.moon-app:has(.moon-voyage, .moon-arrival) .moon-stage {
+  pointer-events: none;
+}
+.moon-voyage,
+.moon-arrival {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 30px clamp(24px, 5vw, 74px) 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(13 28 29 / 83%), transparent 55%);
+}
+.moon-voyage-brand,
+.moon-arrival-top {
+  font-size: 12px;
+  font-weight: 700;
+}
+.moon-voyage-brand span,
+.moon-arrival-top span {
+  color: #bdc6b9;
+  font-weight: 400;
+}
+.moon-voyage-copy {
+  width: min(405px, 43vw);
+  margin-top: auto;
+  padding-bottom: clamp(65px, 11vh, 135px);
+  animation: moon-appear 0.55s both;
+}
+.moon-voyage-copy p {
+  margin-bottom: 13px;
+  color: #e5b787;
+  font-size: 10px;
+  font-weight: 700;
+}
+.moon-voyage-copy strong {
+  display: block;
+  font-size: clamp(43px, 5.4vw, 80px);
+  line-height: 0.98;
+}
+.moon-voyage-copy > span {
+  display: block;
+  max-width: 340px;
+  margin-top: 18px;
+  color: #e1ded3;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.moon-voyage-bottom {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 25px;
+  color: #c8d5cf;
+  font-size: 11px;
+}
+.moon-voyage-bottom small {
+  margin-left: auto;
+  font-size: 10px;
+  color: #bbc7bf;
+}
+.moon-voyage-bottom button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: #faf6ed;
+  pointer-events: auto;
+}
+.moon-voyage-bottom small + button {
+  margin-left: 0;
+}
+.moon-voyage-track {
+  height: 3px;
+  margin: 0 calc(-1 * clamp(24px, 5vw, 74px));
+  background: #3f5553;
+}
+.moon-voyage-track i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #e5b787;
+  animation: moon-progress linear forwards;
+}
+.moon-arrival {
+  background: linear-gradient(90deg, rgb(11 29 32 / 96%), rgb(11 29 32 / 36%) 53%, transparent 85%);
+}
+.moon-arrival-copy {
+  margin: auto 0;
+  width: min(420px, 43vw);
+}
+.moon-arrival-copy .moon-kicker {
+  color: #e8b98f;
+}
+.moon-arrival h2 {
+  font-size: clamp(65px, 7vw, 115px);
+  line-height: 0.87;
+  margin: 24px 0;
+}
+.moon-arrival h2 em {
+  color: #c0d7cd;
+  font-style: normal;
+}
+.moon-arrival-copy p {
+  margin-bottom: 5px;
+  font-size: 19px;
+  font-weight: 600;
+}
+.moon-arrival-copy > span {
+  color: #c9d1c6;
+  font-size: 12px;
+}
+.moon-arrival-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+}
+.moon-arrival-actions button {
+  pointer-events: auto;
+}
+.moon-arrival-actions .moon-primary {
+  padding: 0 19px;
+  margin: 0;
+}
+.moon-arrival-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #e9e6dd;
+  font-size: 12px;
+}
+.moon-arrival-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 0 28px;
+  color: #bdcbc4;
+  font-size: 11px;
+}
+@media (max-width: 720px) {
+  .moon-onboard h1 {
+    font-size: 54px;
+  }
+  .moon-overview h1 {
+    font-size: 24px;
+  }
+  .moon-return {
+    left: 18px;
+    bottom: 74px;
+  }
+  .moon-voyage,
+  .moon-arrival {
+    padding: 24px 7vw 0;
+    background: linear-gradient(0deg, #0e2528 0%, rgb(14 37 40 / 86%) 25%, transparent 62%);
+  }
+  .moon-voyage-copy {
+    width: 100%;
+    padding-bottom: 14vh;
+  }
+  .moon-voyage-copy strong {
+    font-size: clamp(46px, 12vw, 65px);
+  }
+  .moon-voyage-copy > span {
+    font-size: 12px;
+  }
+  .moon-voyage-bottom {
+    flex-wrap: wrap;
+    font-size: 10px;
+  }
+  .moon-voyage-bottom small {
+    order: 3;
+    flex-basis: 100%;
+    margin: -12px 0 0;
+  }
+  .moon-voyage-bottom button {
+    margin-left: auto;
+  }
+  .moon-voyage-track {
+    margin: 0 -7vw;
+  }
+  .moon-arrival-copy {
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: 9vh;
+  }
+  .moon-arrival h2 {
+    font-size: 78px;
+  }
+  .moon-arrival-bottom span:last-child {
+    font-size: 9px;
+    text-align: right;
   }
 }

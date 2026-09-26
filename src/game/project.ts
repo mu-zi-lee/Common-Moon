@@ -1,4 +1,28 @@
 export type TaskStatus = "todo" | "focusing" | "submitted" | "approved";
+export const buildingKinds = ["habitat", "workshop", "greenhouse", "observatory", "relay"] as const;
+export type BuildingKind = (typeof buildingKinds)[number];
+export const buildingNames: Record<BuildingKind, string> = {
+  habitat: "Community hub",
+  workshop: "Workshop",
+  greenhouse: "Greenhouse",
+  observatory: "Observatory",
+  relay: "Relay tower",
+};
+
+export function suggestedBuilding(title: string): BuildingKind {
+  if (/research|test|data|study|实验|测试|研究|分析|观测/i.test(title)) return "observatory";
+  if (/design|sketch|art|visual|体验|设计|原型|绘制/i.test(title)) return "greenhouse";
+  if (/agent|connect|message|share|present|submit|联络|提交|发布|展示|演示|沟通/i.test(title))
+    return "relay";
+  if (/build|code|develop|implement|ship|开发|实现|编程|搭建|构建/i.test(title)) return "workshop";
+  return "habitat";
+}
+
+export function taskBuilding(task: MoonTask): BuildingKind {
+  return buildingKinds.includes(task.buildingKind as BuildingKind)
+    ? (task.buildingKind as BuildingKind)
+    : suggestedBuilding(task.title);
+}
 
 export type MoonTask = {
   id: string;
@@ -11,6 +35,8 @@ export type MoonTask = {
   evidence: string;
   blocker: string;
   reviewedBy: number | null;
+  buildingKind?: BuildingKind;
+  approvedAt?: number | null;
 };
 
 export type ProjectState = {
@@ -22,8 +48,9 @@ export type ProjectState = {
 };
 
 export type ProjectAction =
-  | { type: "add"; title: string; acceptance: string }
+  | { type: "add"; title: string; acceptance: string; buildingKind?: BuildingKind }
   | { type: "assign"; taskId: string; owner: number }
+  | { type: "building"; taskId: string; buildingKind: BuildingKind }
   | { type: "launch" }
   | { type: "focus"; taskId: string }
   | { type: "pause"; taskId: string }
@@ -67,6 +94,8 @@ export function applyProjectAction(
     const title = action.title.trim().slice(0, 90);
     const acceptance = action.acceptance.trim().slice(0, 300);
     if (!title || !acceptance) throw new Error("A task needs a title and acceptance criteria");
+    const buildingKind = action.buildingKind ?? suggestedBuilding(title);
+    if (!buildingKinds.includes(buildingKind)) throw new Error("Choose a known building");
     next.tasks.push({
       id: crypto.randomUUID(),
       title,
@@ -78,6 +107,8 @@ export function applyProjectAction(
       evidence: "",
       blocker: "",
       reviewedBy: null,
+      buildingKind,
+      approvedAt: null,
     });
     log = `Sector ${next.tasks.length} charted: ${title}`;
   } else if (action.type === "launch") {
@@ -95,7 +126,13 @@ export function applyProjectAction(
   } else {
     const task = next.tasks.find((entry) => entry.id === action.taskId);
     if (!task) throw new Error("Sector not found");
-    if (action.type === "assign") {
+    if (action.type === "building") {
+      if (next.phase !== "planning") throw new Error("Building choices lock at launch");
+      if (actor !== 1) throw new Error("Only the project creator chooses buildings");
+      if (!buildingKinds.includes(action.buildingKind)) throw new Error("Choose a known building");
+      task.buildingKind = action.buildingKind;
+      log = `${task.title} will become a ${buildingNames[action.buildingKind]}`;
+    } else if (action.type === "assign") {
       if (next.phase !== "planning") throw new Error("Assignments lock at launch");
       if (actor !== 1) throw new Error("Only the project creator assigns tasks");
       if (!memberSlots.includes(action.owner)) throw new Error("That teammate has not joined");
@@ -109,6 +146,7 @@ export function applyProjectAction(
         if (action.type === "approve") {
           task.status = "approved";
           task.reviewedBy = actor;
+          task.approvedAt = now;
           log = `${task.title} approved by crew ${actor}; sector revealed`;
         } else {
           if (!action.reason.trim()) throw new Error("Explain what needs another pass");
