@@ -1,0 +1,985 @@
+.moon-app {
+  --jade: #9bdbc7;
+  --cream: #f2efe3;
+  --gold: #e8bf81;
+  --ink: #243434;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  color: var(--cream);
+  background: #122024;
+  font-family: "Nunito", "Work Sans", system-ui, sans-serif;
+}
+.moon-app * {
+  letter-spacing: 0;
+}
+.moon-app button {
+  cursor: pointer;
+}
+.moon-app button:disabled {
+  opacity: 0.47;
+  cursor: not-allowed;
+}
+.moon-app button:focus-visible,
+.moon-app input:focus-visible,
+.moon-app textarea:focus-visible,
+.moon-app select:focus-visible,
+.moon-app a:focus-visible {
+  outline: 2px solid #54bca4;
+  outline-offset: 3px;
+}
+.moon-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.moon-stage canvas {
+  display: block;
+  touch-action: none;
+}
+.moon-scene-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding: 24px 24px 38px;
+  text-align: center;
+  color: #d2e4dd;
+  background: #172122;
+  isolation: isolate;
+  font-size: 12px;
+}
+.moon-scene-fallback::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 49%;
+  width: min(70vh, 65vw, 610px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 27% 25%, transparent 38%, rgb(15 30 30 / 75%) 100%),
+    url("/moon-color.jpg") center / 220% 100%;
+  box-shadow: 15px 10px 65px rgb(0 0 0 / 25%);
+  transform: translate(-50%, -50%);
+  opacity: 0.82;
+}
+.moon-header {
+  height: 70px;
+  padding: 0 clamp(18px, 3vw, 46px);
+  position: relative;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: rgb(13 29 30 / 88%);
+  border-bottom: 1px solid rgb(184 220 208 / 18%);
+  backdrop-filter: blur(15px);
+}
+.moon-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f0f3e9;
+  font-size: 21px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.moon-brand > span:last-child > span {
+  color: var(--jade);
+  font-weight: 400;
+}
+.moon-brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #234a42;
+  color: #d9f8e6;
+}
+.moon-header-center {
+  max-width: 45vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #c3d5cd;
+  font-size: 12px;
+}
+.moon-header-tools {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.moon-tool {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  border: 1px solid rgb(189 224 209 / 27%);
+  color: #ddeae1;
+}
+.moon-tool:hover {
+  background: #26463f;
+  color: #fff;
+}
+.moon-panel-toggle {
+  display: none;
+}
+.moon-kicker,
+.moon-eyebrow,
+.moon-list-title,
+.moon-bottom-note {
+  font-size: 10px;
+  font-weight: 700;
+}
+.moon-kicker {
+  color: #5d9c89;
+}
+.moon-onboard {
+  position: relative;
+  z-index: 3;
+  width: min(560px, 100%);
+  min-height: calc(100svh - 70px);
+  padding: clamp(32px, 5vh, 62px) 26px 30px clamp(22px, 5vw, 80px);
+  background: linear-gradient(90deg, #0b1516 0%, rgb(11 21 22 / 97%) 82%, rgb(11 21 22 / 0%) 100%);
+}
+.moon-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--jade);
+}
+.moon-small-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--jade);
+  box-shadow: 0 0 14px #8ce5ba;
+}
+.moon-onboard h1 {
+  margin: 18px 0 0;
+  font-size: clamp(43px, 3.8vw, 58px);
+  line-height: 1.06;
+  font-weight: 700;
+}
+.moon-onboard h1 em {
+  color: var(--jade);
+  font-style: normal;
+}
+.moon-intent {
+  max-width: 365px;
+  margin: 16px 0 22px;
+  color: #c1d1c8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.moon-home-tabs {
+  display: flex;
+  border-bottom: 1px solid #526b60;
+  gap: 22px;
+}
+.moon-home-tabs button {
+  position: relative;
+  height: 36px;
+  color: #c1d0c5;
+  font-size: 13px;
+  font-weight: 600;
+}
+.moon-home-tabs button.active {
+  color: #d9f9e8;
+}
+.moon-home-tabs button.active::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  background: var(--jade);
+}
+.moon-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.moon-form label,
+.moon-task-form label,
+.moon-mini-form label,
+.moon-select-label {
+  display: grid;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 650;
+}
+.moon-form input,
+.moon-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #647b70;
+  border-radius: 4px;
+  background: #182a29;
+  color: #f5f5ec;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.moon-form input::placeholder,
+.moon-form textarea::placeholder {
+  color: #a4b6aa;
+}
+.moon-primary,
+.moon-launch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 4px;
+  background: #b2e6c9;
+  color: #16322b;
+  font-size: 13px;
+  font-weight: 700;
+}
+.moon-primary:hover,
+.moon-launch:hover {
+  background: #d0f5da;
+}
+.moon-primary {
+  margin-top: 7px;
+}
+.moon-sample {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  margin-top: 9px;
+  color: #c2e5d0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.moon-sample:hover {
+  color: #fff;
+}
+.moon-verse {
+  margin-top: 12px;
+  color: #b2c7ba;
+  font-size: 11px;
+}
+.moon-verse span {
+  margin: 0 6px;
+  color: var(--gold);
+}
+.moon-error {
+  margin: 14px 0;
+  color: #a64436;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.moon-onboard .moon-error {
+  color: #ffd4b0;
+}
+.moon-spin {
+  animation: moon-spin 1s linear infinite;
+}
+@keyframes moon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.moon-overview {
+  position: absolute;
+  z-index: 2;
+  top: 101px;
+  left: clamp(18px, 3vw, 46px);
+  width: min(280px, 24vw);
+  pointer-events: none;
+}
+.moon-overview .moon-kicker {
+  color: var(--jade);
+}
+.moon-overview h1 {
+  margin: 11px 0 7px;
+  font-size: clamp(23px, 2.4vw, 36px);
+  font-weight: 700;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.moon-overview > p {
+  color: #c9d7cd;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.moon-completion {
+  margin-top: 23px;
+}
+.moon-completion > span {
+  font-size: 32px;
+  color: #c6efce;
+  font-variant-numeric: tabular-nums;
+}
+.moon-completion small {
+  font-size: 11px;
+  color: #cbdad0;
+}
+.moon-completion > div {
+  margin-top: 10px;
+  height: 5px;
+  border-radius: 5px;
+  background: #40534d;
+}
+.moon-completion i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #b4e8c5;
+  transition: width 0.6s;
+}
+.moon-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 11px;
+  margin-top: 17px;
+}
+.moon-people span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #c9d4cb;
+  font-size: 10px;
+}
+.moon-people span.is-me {
+  color: #b9f1d1;
+}
+.moon-overview .moon-complete {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #b9f1d1;
+}
+.moon-bottom-note {
+  position: absolute;
+  left: clamp(18px, 3vw, 46px);
+  right: 410px;
+  bottom: 24px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: #b5cabd;
+  opacity: 0.8;
+}
+
+.moon-panel {
+  position: absolute;
+  z-index: 5;
+  top: 70px;
+  right: 0;
+  bottom: 0;
+  width: min(390px, 34vw);
+  background: #eff3ec;
+  color: var(--ink);
+  border-left: 1px solid #d0ddd3;
+  transform: translateX(100%);
+  transition: transform 0.28s ease;
+  box-shadow: -12px 0 40px rgb(0 0 0 / 12%);
+}
+.moon-panel.is-open {
+  transform: translateX(0);
+}
+.moon-panel-handle {
+  display: none;
+}
+.moon-panel-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 28px 26px 45px;
+  scrollbar-color: #b7c7b7 transparent;
+}
+.moon-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 19px;
+  border-bottom: 1px solid #cad9cc;
+}
+.moon-panel-heading h2 {
+  margin: 7px 0 0;
+  font-size: 22px;
+  font-weight: 750;
+}
+.moon-close {
+  color: #5d7770;
+}
+.moon-local {
+  margin-top: 18px;
+  padding: 13px 14px;
+  background: #dcebe0;
+  color: #426057;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.moon-segment {
+  display: flex;
+  margin: 10px 0 6px;
+  border: 1px solid #9ab7a9;
+  border-radius: 4px;
+}
+.moon-segment button {
+  flex: 1;
+  min-height: 32px;
+  color: #42645b;
+  font-size: 11px;
+}
+.moon-segment button.active {
+  background: #337d67;
+  color: white;
+}
+.moon-help {
+  color: #667d70;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 15px 0;
+}
+.moon-task-form {
+  display: grid;
+  gap: 11px;
+  margin: 18px 0 26px;
+}
+.moon-task-form input,
+.moon-task-form textarea,
+.moon-mini-form input,
+.moon-mini-form textarea,
+.moon-select-label select {
+  min-width: 0;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #b6c9b9;
+  padding: 9px 10px;
+  background: #fff;
+  color: #223934;
+  font: inherit;
+  font-size: 12px;
+  resize: vertical;
+}
+.moon-task-form input::placeholder,
+.moon-task-form textarea::placeholder,
+.moon-mini-form input::placeholder,
+.moon-mini-form textarea::placeholder {
+  color: #728b7c;
+}
+.moon-add,
+.moon-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 39px;
+  border-radius: 4px;
+  border: 1px solid #80ae95;
+  color: #23614c;
+  font-size: 12px;
+  font-weight: 700;
+}
+.moon-add:hover,
+.moon-action:hover {
+  background: #e0ede1;
+}
+.moon-list-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #5c8070;
+}
+.moon-list-title > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.moon-task-list {
+  margin: 12px 0 19px;
+  border-top: 1px solid #d4dfd3;
+}
+.moon-task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 61px;
+  padding: 9px 5px;
+  text-align: left;
+  border-bottom: 1px solid #d4dfd3;
+  color: #283f38;
+}
+.moon-task-row:hover,
+.moon-task-row.selected {
+  background: #dceadf;
+}
+.moon-task-row > svg {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #729180;
+}
+.moon-task-symbol {
+  flex: 0 0 33px;
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #c2d0c5;
+  color: #426255;
+  font-size: 10px;
+  font-weight: 700;
+}
+.moon-task-symbol.is-focusing {
+  background: #f1d6a2;
+  color: #644923;
+}
+.moon-task-symbol.is-submitted {
+  background: #a3cfbf;
+  color: #1a5648;
+}
+.moon-task-symbol.is-approved {
+  background: #3d9876;
+  color: white;
+}
+.moon-task-info {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.moon-task-info strong {
+  font-size: 12px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.moon-task-info small {
+  font-size: 10px;
+  color: #677e71;
+}
+.moon-empty {
+  color: #6d8074;
+  font-size: 12px;
+  margin: 15px 0;
+}
+.moon-launch {
+  width: 100%;
+  margin-top: 15px;
+}
+.moon-inspector {
+  border-top: 2px solid #8aba9e;
+  padding: 22px 0 25px;
+}
+.moon-inspector h3 {
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.25;
+  margin: 14px 0;
+}
+.moon-criteria,
+.moon-evidence {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.moon-criteria strong,
+.moon-evidence strong {
+  color: #5b7d6d;
+  font-size: 10px;
+}
+.moon-evidence {
+  padding: 13px;
+  background: #dfece2;
+}
+.moon-evidence a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1c7861;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+.moon-select-label {
+  margin: 16px 0;
+}
+.moon-blocker {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 11px;
+  background: #f6e8d7;
+  color: #705231;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.moon-timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 15px 0;
+  color: #9a6b2e;
+}
+.moon-timer span {
+  font-size: 10px;
+  font-weight: 700;
+}
+.moon-timer strong {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.moon-time-spent {
+  color: #5d7a69;
+  font-size: 11px;
+}
+.moon-action {
+  width: 100%;
+  margin-top: 12px;
+}
+.moon-action.is-primary {
+  background: #347e64;
+  border-color: #347e64;
+  color: #fff;
+}
+.moon-action.is-primary:hover {
+  background: #246d54;
+}
+.moon-mini-form {
+  display: grid;
+  gap: 2px;
+  margin-top: 16px;
+}
+.moon-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  color: #357c64;
+  font-size: 11px;
+  font-weight: 650;
+}
+.moon-review {
+  margin-top: 15px;
+}
+.moon-revealed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #297e61;
+  font-size: 12px;
+}
+.moon-connection,
+.moon-history {
+  padding: 22px 0;
+  border-top: 1px solid #cad9cc;
+}
+.moon-connection p,
+.moon-history p {
+  color: #5b7265;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.moon-connection button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  border-bottom: 1px solid #cad9cc;
+  color: #286b55;
+  font-size: 11px;
+  text-align: left;
+}
+.moon-history p {
+  margin: 10px 0;
+}
+
+.moon-app:has(.moon-intro) .moon-header,
+.moon-app:has(.moon-intro) .moon-onboard,
+.moon-app:has(.moon-intro) .moon-overview,
+.moon-app:has(.moon-intro) .moon-bottom-note,
+.moon-app:has(.moon-intro) .moon-panel {
+  visibility: hidden;
+}
+.moon-app:has(.moon-intro) .moon-stage {
+  pointer-events: none;
+}
+.moon-intro {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto 3px;
+  padding: 37px 5vw 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgb(8 19 19 / 94%) 0%,
+    rgb(8 19 19 / 72%) 23%,
+    transparent 47%
+  );
+}
+.moon-intro .moon-kicker {
+  color: var(--jade);
+}
+.moon-intro-main {
+  align-self: end;
+  width: min(380px, 37vw);
+  padding-bottom: clamp(75px, 14vh, 150px);
+  animation: moon-appear 0.7s both;
+}
+.moon-intro-main p {
+  margin-bottom: 12px;
+  color: var(--jade);
+  font-size: 11px;
+  font-weight: 700;
+}
+.moon-intro-main strong {
+  display: block;
+  font-size: clamp(46px, 5vw, 76px);
+  font-weight: 700;
+  line-height: 1.05;
+}
+.moon-intro-verse {
+  display: block;
+  margin-top: 17px;
+  color: #e8d5b2;
+  font-size: 15px;
+}
+.moon-intro-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 28px;
+  color: #c2d7c7;
+  font-size: 12px;
+}
+.moon-intro-footer button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #f3f4ea;
+  pointer-events: auto;
+}
+.moon-intro-progress {
+  margin: 0 -5vw;
+  height: 3px;
+  background: #4a6258;
+}
+.moon-intro-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #b0e9c8;
+  animation: moon-progress 5.2s linear forwards;
+}
+@keyframes moon-progress {
+  to {
+    width: 100%;
+  }
+}
+@keyframes moon-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 1040px) {
+  .moon-panel {
+    width: 350px;
+  }
+  .moon-bottom-note {
+    right: 370px;
+  }
+}
+@media (max-width: 720px) {
+  .moon-header {
+    height: 59px;
+    padding: 0 13px;
+    gap: 8px;
+  }
+  .moon-brand {
+    font-size: 16px;
+    gap: 6px;
+  }
+  .moon-brand-icon {
+    width: 29px;
+    height: 29px;
+  }
+  .moon-brand-icon svg {
+    width: 17px;
+  }
+  .moon-header-center {
+    display: none;
+  }
+  .moon-tool {
+    width: 33px;
+    height: 33px;
+  }
+  .moon-panel-toggle {
+    display: grid;
+  }
+  .moon-onboard {
+    width: 100%;
+    min-height: calc(100svh - 59px);
+    padding: 34px 23px 30px;
+    background: linear-gradient(
+      180deg,
+      rgb(9 19 19 / 91%),
+      rgb(9 19 19 / 83%) 76%,
+      rgb(9 19 19 / 60%)
+    );
+  }
+  .moon-onboard h1 {
+    font-size: clamp(42px, 10vw, 58px);
+  }
+  .moon-intent {
+    margin: 15px 0 18px;
+    font-size: 12px;
+  }
+  .moon-form {
+    gap: 9px;
+    margin-top: 16px;
+  }
+  .moon-verse {
+    margin-top: 13px;
+  }
+  .moon-overview {
+    top: 72px;
+    left: 18px;
+    width: calc(100% - 36px);
+  }
+  .moon-overview h1 {
+    font-size: 20px;
+    margin: 4px 0;
+    max-width: 240px;
+  }
+  .moon-overview > p {
+    max-width: 260px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .moon-completion {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 105px;
+    margin: 0;
+    text-align: right;
+  }
+  .moon-completion > span {
+    font-size: 21px;
+  }
+  .moon-completion small {
+    display: block;
+    font-size: 9px;
+  }
+  .moon-people {
+    max-width: 260px;
+    margin-top: 8px;
+    gap: 4px 8px;
+  }
+  .moon-people span {
+    font-size: 9px;
+  }
+  .moon-bottom-note {
+    display: none;
+  }
+  .moon-panel {
+    top: auto;
+    width: 100%;
+    height: min(63svh, 620px);
+    bottom: 0;
+    border-left: 0;
+    border-top: 1px solid #b2cab9;
+    transform: translateY(calc(100% - 49px));
+    box-shadow: 0 -15px 40px rgb(0 0 0 / 21%);
+  }
+  .moon-panel.is-open {
+    transform: translateY(0);
+  }
+  .moon-panel-handle {
+    width: 100%;
+    height: 49px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #285743;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .moon-panel-handle span:first-child {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .moon-panel.is-open .moon-panel-handle svg {
+    transform: rotate(180deg);
+  }
+  .moon-panel-scroll {
+    height: calc(100% - 49px);
+    padding: 18px 23px 44px;
+  }
+  .moon-scene-fallback::before {
+    width: 90vw;
+  }
+  .moon-intro {
+    padding: 25px 7vw 0;
+    background: linear-gradient(
+      0deg,
+      #0c1b1c 0%,
+      rgb(12 27 28 / 96%) 13%,
+      transparent 51%,
+      rgb(12 27 28 / 48%) 100%
+    );
+  }
+  .moon-intro-main {
+    width: 100%;
+    padding-bottom: 12vh;
+  }
+  .moon-intro-progress {
+    margin: 0 -7vw;
+  }
+  .moon-intro-main strong {
+    font-size: clamp(43px, 10vw, 62px);
+  }
+}
+@media (max-width: 720px) and (max-height: 670px) {
+  .moon-onboard {
+    padding-top: 20px;
+  }
+  .moon-onboard h1 {
+    margin-top: 12px;
+  }
+  .moon-intent {
+    margin: 10px 0;
+  }
+  .moon-panel {
+    height: 65svh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moon-app *,
+  .moon-app *::before,
+  .moon-app *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

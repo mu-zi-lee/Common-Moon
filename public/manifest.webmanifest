@@ -1,12 +1,12 @@
 {
-  "name": "CosLog - 遇见 Cosplayer",
-  "short_name": "CosLog",
-  "description": "记录漫展中每一次遇见 Cosplayer 的 AI 手账",
+  "name": "Common Moon",
+  "short_name": "Common Moon",
+  "description": "A shared Moon for real team projects",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f7fa",
-  "theme_color": "#1e88ff",
-  "orientation": "portrait",
+  "background_color": "#0b1516",
+  "theme_color": "#0b1516",
+  "orientation": "any",
   "icons": [
     {
       "src": "/icon.svg",

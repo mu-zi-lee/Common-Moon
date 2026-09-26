@@ -1,5 +1,17 @@
 {
-  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  "include": [
+    "src/game/**/*.ts",
+    "src/game/**/*.tsx",
+    "src/routes/**/*.ts",
+    "src/routes/**/*.tsx",
+    "src/router.tsx",
+    "src/start.ts",
+    "src/server.ts",
+    "src/routeTree.gen.ts",
+    "vite.config.ts",
+    "eslint.config.js",
+    "scripts/**/*.ts"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",

@@ -1,0 +1,10 @@
+.git
+node_modules
+.output
+.wrangler
+dist
+.env
+.env.*
+!.env.example
+*.log
+coverage
